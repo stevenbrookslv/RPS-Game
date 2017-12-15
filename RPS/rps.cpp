@@ -21,11 +21,11 @@ enum player { tie, computer, user };    // use for returning winner of the throw
 enum hand { R = 0, P = 1, S = 2 };      // use for quantifying possible moves
 char hand_choices[] = { 'R', 'P', 'S' };// character representation of enum hand type
 const player win_table[3][3] =          // table to determine the winner of any given throw
-{
-    { tie, user, computer },
-    { computer, tie, user },
-    { user, computer, tie },
-};
+    {
+        { tie, user, computer },
+        { computer, tie, user },
+        { user, computer, tie },
+    };
 
 hand choices[] = { R, P, S };  // for the purpose of randomly selecting a throw
 
@@ -63,16 +63,21 @@ void printThrows(const vector<hand> &comp, const vector<hand> &user) {
         cout << user[i] << " ";
 }
 
-player findWinner(hand comp, hand user) { return win_table[comp][user]; }
+// ***********************************************************
+// Returns the winner of the round
+player findWinner(hand comp, hand user) { 
+    cout << "winner: " << win_table[comp][user];
+    return win_table[comp][user]; 
+}
 
 // ***********************************************************
 int main() {
     // Main function variables
-    int rounds = 3;
+    int rounds = 1;
     int user_wins = 0;
     int comp_wins = 0;
     int tie_count = 0;          // number of ties between computer and user
-    char c_user;                 // integer user throw
+    char c_user;                // char user throw
     hand user_throw;            // throw choice of the user
     hand comp_throw;            // throw choice of the computer 
     
@@ -94,30 +99,31 @@ int main() {
     */
 
     // Reserve required space based on the number of rounds
-    user_moves.reserve(rounds*3);       // each round consists of three throws
-    comp_moves.reserve(rounds*3);
+    user_moves.reserve(rounds*3);       // space for user's documented moves 
+    comp_moves.reserve(rounds*3);       // space for computer's documented moves
 
 
     // Play specified amount of rounds
     for(int i = 0; i < rounds; i++) {
         cout << bold << "\tROUND " << (i+1) <<  unbold << endl;
-        for(int j = 0; j < 3; j++) {
-            // Determine computer's move
-            comp_throw = computerThrow();
+        for(int j = 0; j < 3; j++) {            // each round consists of 3 throws
+
+            comp_throw = computerThrow();       // call function to determine computer's hand
             comp_moves.push_back(comp_throw);   // document computer's most recent hand
-            // Read in user's hand 
-            cout << "\tYour throw: ";   
-            cin >> c_user;
-            c_user = toupper(c_user);
-            user_throw = static_cast<hand>(c_user);
+
+            cout << "\tYour throw: ";           // prompt user to enter their throw
+            cin >> c_user;                      // read in user's hand as a char
+            user_throw = static_cast<hand>(toupper(c_user));    // static cast the capitalized throw as a hand type 
             user_moves.push_back(user_throw);   // document user's most recent hand
 
-            // Output computer's throw
             cout << "\tComputer's throw: " << hand_choices[comp_throw] << endl;
-            // Calculate new probabilities based off recent throws
-            calculateProb(comp_moves, user_moves);
+            calculateProb(comp_moves, user_moves); // calculate new probabilities based on most recent throws
 
-            // Update wins and ties
+            // Determine winner, update wins and ties
+            if(findWinner(comp_throw, user_throw) == tie) {
+                cout << "tie game" << endl;
+                tie_count++;
+            }
         }
         cout << endl;
     }

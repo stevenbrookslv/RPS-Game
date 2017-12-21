@@ -66,7 +66,7 @@ void printThrows(const vector<hand> &comp, const vector<hand> &user) {
 // ***********************************************************
 // Returns the winner of the round
 player findWinner(hand comp, hand user) { 
-    cout << "winner: " << win_table[comp][user];
+    cout << comp << " against " << user << "\twinner: " << win_table[comp][user];
     return win_table[comp][user]; 
 }
 
@@ -115,15 +115,19 @@ int main() {
             cin >> c_user;                      // read in user's hand as a char
             user_throw = static_cast<hand>(toupper(c_user));    // static cast the capitalized throw as a hand type 
             user_moves.push_back(user_throw);   // document user's most recent hand
-
+            cout << "\t user: " << user_throw << endl;
             cout << "\tComputer's throw: " << hand_choices[comp_throw] << endl;
-            calculateProb(comp_moves, user_moves); // calculate new probabilities based on most recent throws
+            //calculateProb(comp_moves, user_moves); // calculate new probabilities based on most recent throws
 
             // Determine winner, update wins and ties
+            /*
             if(findWinner(comp_throw, user_throw) == tie) {
                 cout << "tie game" << endl;
                 tie_count++;
             }
+            */
+            findWinner(comp_throw, user_throw);
+            cout << endl;
         }
         cout << endl;
     }

@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <limits>
 #include <stdlib.h>
 #include <time.h>
 
@@ -14,7 +15,7 @@ const int MAX_ROUNDS = 15;     // maximum number of rounds the user can choose
 
 // Global variables
 double prob_rock     = 35.4;    // initialized probability that the user will throw rock
-double prob_scissors = 35;      // initialized probability that the user will throw scissors
+double prob_scissors = 35.0;    // initialized probability that the user will throw scissors
 double prob_paper    = 29.6;    // initialized probability that the user will throw paper
 
 enum player { tie, computer, user };    // use for returning winner of the throw
@@ -38,13 +39,24 @@ ostream& bold(ostream& out) { return out << "\e[1m"; }
 ostream& unbold(ostream& out) { return out << "\e[0m"; }
 
 // ***********************************************************
+hand userProb() {
+    hand likely = R;   // hand with the highest likelihood of being played 
+    if(prob_paper > prob_rock)
+        likely = 
+}
+
+// ***********************************************************
 // Determine what hand the computer should throw 
 hand computerThrow() {
     // Returns either 'R', 'P', or 'S' based off user probability 
+    double comp_choice; // the decided throw of the computer
+    comp_choice = numeric_limits<double>::max(prob_rock, prob_paper, prob_scissors);
+    cout << "best choice: " << comp_choice << endl;
 
     // For testing purposes, return random throw
     srand(time(NULL));
     return choices[rand()%3];
+    
 }
 
 // ***********************************************************

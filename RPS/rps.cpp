@@ -40,24 +40,31 @@ ostream& unbold(ostream& out) { return out << "\e[0m"; }
 
 // ***********************************************************
 hand userProb() {
-    hand likely = R;   // hand with the highest likelihood of being played 
+    hand likely = R;    // hand with the highest likelihood of being played 
     if(prob_paper > prob_rock)
-        likely = 
+        likely = P;
+    else if(prob_scissors > prob_rock)
+        likely = S;
+
+    return likely;      // returns the hand the user is most likely to throw     
 }
 
 // ***********************************************************
 // Determine what hand the computer should throw 
 hand computerThrow() {
     // Returns either 'R', 'P', or 'S' based off user probability 
-    double comp_choice; // the decided throw of the computer
-    comp_choice = numeric_limits<double>::max(prob_rock, prob_paper, prob_scissors);
-    cout << "best choice: " << comp_choice << endl;
+    //double comp_choice; // the decided throw of the computer
+    //cout << "best choice: " << comp_choice << endl;
 
     // For testing purposes, return random throw
     srand(time(NULL));
     return choices[rand()%3];
     
 }
+
+// ***********************************************************
+// Returns the winner of the round
+player findWinner(hand comp, hand user) { return win_table[comp][user]; }
 
 // ***********************************************************
 // Compute new probabilities based off user's/computer's previous choices 
@@ -71,19 +78,24 @@ void calculateProb(const vector<hand> &comp, const vector<hand> &user) {
 void printThrows(const vector<hand> &comp, const vector<hand> &user) {
     cout << bold << "THROWS MADE BY PLAYERS" << unbold << endl;
     cout << "  Computer throws:\t";
-    for(int i = 0; i <  comp.capacity(); i++)
+    for(int i = 0; i < comp.capacity(); i++)
         cout << hand_choices[comp[i]] << " ";
 
     cout << "\n  User throws:    \t";
     for(int i = 0; i < user.capacity(); i++)
         cout << hand_choices[user[i]] << " ";
+    
+    cout << "\n  Computer win:   \t";
+    for(int i = 0; i < comp.capacity(); i++) {
+        if(findWinner(comp[i], user[i]) == 1) // returning 1 indicates a computer win 
+            cout << "* ";
+        else
+            cout << "  ";
+    }
 
     cout << "\n\n";
 }
 
-// ***********************************************************
-// Returns the winner of the round
-player findWinner(hand comp, hand user) { return win_table[comp][user]; }
 
 // ***********************************************************
 // Returns the given character as a hand enum type 
@@ -144,16 +156,27 @@ int main() {
 
             cout << "\tYour throw: ";           // prompt user to enter their throw
             cin >> c_user;                      // read in user's hand as a char
-            user_throw = convertInput(toupper(c_user));  // convert the user's character input to a hand enum type
+            c_user = toupper(c_user);           // guarenteed capital letter for user throw
+
+            while(c_user != 'R' && c_user != 'S' && c_user != 'P') { // error check user input 
+                cout << "\tError, please enter 'r' or 'p' or 's' (capital or lowercase): ";
+                cin >> c_user;
+                c_user = toupper(c_user);
+            }
+            user_throw = convertInput(c_user);  // convert the user's character input to a hand enum type
             user_moves.push_back(user_throw);   // document user's most recent hand
 
             cout << "\tComputer throw: " << hand_choices[comp_throw] << endl; // show user the computer's selected throw
 
             //calculateProb(comp_moves, user_moves); // calculate new probabilities based on most recent throws
 
-            winner = findWinner(comp_throw, user_throw); // determine the winner of the round
-            switch(winner) {    // increment count variables 
-                case 0: tie_count++; break;
+            winner = findWinner(comp_throw, user_throw);// determine the winner of the round
+            switch(winner) {
+                case 0: 
+                    tie_count++; // case 0 indicates a tie
+                    j--;         // a tie leads to a replay of the last throw
+                    cout << bold << "\t TIE GAME, REPLAY" << unbold << endl;
+                    break; 
                 case 1: comp_wins++; break;
                 case 2: user_wins++; break;
             }
